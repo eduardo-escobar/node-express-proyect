@@ -1,49 +1,35 @@
-var http = require('http');
-var url = require('url')
-var queryString = require('querystring');
-var { info, error } = require('./modules/my-log');
-var {countries} = require('countries-list');
+const express = require('express');
+const bodyParser = require('body-parser');
+const dotenv = require('dotenv');
+const mongoose = require('mongoose');
 
-var server = http.createServer(function (req, res) {
-    var parsed = url.parse(req.url);
-    console.log('parsed',parsed);
+dotenv.config();
 
-    var pathName = parsed.pathname;
-    var query = queryString.parse(parsed.query);
-    console.log("query",query);
+const routesV1 = require('./routes/v1');
 
-    switch (pathName) {
-        case "/":
-            res.writeHead(200, { 'Content-type': 'text/html' }).write('<h2>Working</h2>');
-            res.end();
-            break;
-        case "/exit":
-            res.writeHead(200, { 'Content-type': 'text/html' }).write('<h2>Bye</h2>');
-            res.end();
-            break;
-        case "/info":
-            var result = info(req.url);
-            res.writeHead(200, { 'Content-type': 'text/html' }).write(result);
-            res.end();
-            break;
-        case "/error":
-            var result = error(req.url);
-            res.writeHead(200, { 'Content-type': 'text/html' }).write(result);
-            res.end();
-            break;
-        case "/countries":
-            var result = info(pathName);
-            res.writeHead(200, { 'Content-type': 'application/json'}).write(JSON.stringify(countries[query.code]));
-            res.end();
-            break;
-        default:
-            res.writeHead(200, { 'Content-type': 'text/html' }).write('<h2>Not Found</h2>');
-            res.end();
-            break;
-    }
+const app = new express();
 
+console.log('Mongo', process.env.MONGO);
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }));
 
-});
+// parse application/json
+app.use(bodyParser.json());
 
-server.listen(3000);
-console.log('runing on 3000')
+routesV1(app);
+
+const port = process.env.PORT || 3000;
+mongoose
+  .connect(process.env.MONGO, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => {
+    console.log('Connected to mongoDB');
+    app.listen(port, () => {
+      console.log('runing on 3000');
+    });
+  })
+  .catch((error) => {
+    console.log(error);
+  });

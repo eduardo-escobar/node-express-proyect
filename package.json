@@ -5,12 +5,21 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node ./src/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon ./src/index.js"
   },
   "author": "Eduardo",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^4.0.1",
+    "body-parser": "^1.19.0",
     "countries-list": "^2.5.4",
-    "express": "^4.17.1"
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "mongoose": "^5.9.16"
+  },
+  "devDependencies": {
+    "eslint": "^7.1.0",
+    "nodemon": "^2.0.4"
   }
 }

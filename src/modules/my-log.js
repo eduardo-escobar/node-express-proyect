@@ -1,10 +1,10 @@
-info = (text) => {
-    console.log('INFO : ' + text);
-    return text;
-}
-error = (text) => {
-    console.log('Error : ' + text);
-    return text;
-}
+const info = (text) => {
+  console.log('INFO : ' + text);
+  return text;
+};
+const error = (text) => {
+  console.log('Error : ' + text);
+  return text;
+};
 module.exports.info = info;
 module.exports.error = error;
