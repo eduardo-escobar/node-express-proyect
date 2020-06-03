@@ -2,9 +2,11 @@ const bcrypt = require('bcrypt');
 const User = require('../../mongo/models/user');
 const createUser = async (req, res) => {
   try {
+
     const { userName, password, email, data } = req.body;
 
     const hash = await bcrypt.hash(password, 15);
+    
     await User.create({
       userName,
       password: hash,

@@ -6,10 +6,9 @@ const productSchema = new Schema(
   {
     title: { type: String, required: true },
     desc: { type: String, required: true },
-    email: { type: String, required: true },
     price: { type: Number, required: true },
-    images: [{ type: String, require: true }],
-    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    images: { type: [{ type: String, require: true }], default: [] },
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', require: true },
   },
   {
     timestamps: true,
