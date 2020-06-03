@@ -1,12 +1,24 @@
 const bcrypt = require('bcrypt');
-
+const User = require('../../mongo/models/user');
 const createUser = async (req, res) => {
   try {
-    const hash = await bcrypt.hash(req.body.password, 15);
+    const { userName, password, email, data } = req.body;
+
+    const hash = await bcrypt.hash(password, 15);
+    await User.create({
+      userName,
+      password: hash,
+      email,
+      data,
+    });
+
     console.log('req.body', req.body);
-    console.log('Fin');
-    res.send({ status: 'OK', messages: hash });
+    res.send({ status: 'OK', messages: 'user created' });
   } catch (error) {
+    if (error.code && error.code === 11000) {
+      res.status(400).send({ status: 'DUPLICATED_VALUES', messages: error.keyValue});
+      return;
+    }
     console.log(error);
     res.status(500).send({ status: 'ERROR', messages: error.message });
   }
