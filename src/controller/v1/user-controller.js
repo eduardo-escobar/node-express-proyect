@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
 const User = require('../../mongo/models/user');
+const Product = require('../../mongo/models/product');
 const jwt = require('jsonwebtoken');
 const expiresIn = 60 * 10;
 const login = async (req, res) => {
@@ -54,17 +55,38 @@ const createUser = async (req, res) => {
 };
 
 const deleteUser = (req, res) => {
-  res.send({ status: 'OK', messages: 'user delete' });
+  const { userId } = req.body;
+
+  if (!userId) {
+    return res
+      .status(402)
+      .send({ status: 'ERROR', messages: 'Mising param userId' });
+  }
+
+  User.findByIdAndDelete(userId)
+    .then(async () => {
+      await Product.deleteMany({ user: userId });
+      return res.send({ status: 'OK', messages: 'user delete' });
+    })
+    .catch((error) =>
+      res.status(500).send({ status: 'ERROR', messages: error.message })
+    );
 };
 
-const getUser = (req, res) => {
-  res.send({ status: 'OK', data: {} });
+const getUser = async (req, res) => {
+  try {
+    const users = await User.find().select({ password: 0, role: 0 });
+
+    res.send({ status: 'OK', data: users });
+  } catch (error) {
+    res.status(500).send({ status: 'ERROR', message: error.message });
+  }
 };
 
 const updateUser = async (req, res) => {
   try {
-    const { userName, email, userId, data } = req.body;
-    await User.findByIdAndUpdate(userId, {
+    const { userName, email, data } = req.body;
+    await User.findByIdAndUpdate(req.sessionData.userId, {
       userName,
       email,
       data,
