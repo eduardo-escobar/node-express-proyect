@@ -1,13 +1,16 @@
-const jwt = require('jsonwebtoken');
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import jwt from 'jsonwebtoken';
+import { Request, Response, NextFunction } from 'express';
 
-const isAuth = (req, resp, netx) => {
+const isAuth = (req: Request, resp: Response, netx: NextFunction): void => {
   try {
     const { token } = req.headers;
     if (token) {
-      const data = jwt.verify(token, process.env.JWT_TOKEN);
+      const data: any = jwt.verify(token as string, process.env.JWT_TOKEN!);
       req.sessionData = { userId: data.userId, role: data.role };
       netx();
     } else {
+      // eslint-disable-next-line no-throw-literal
       throw {
         code: 404,
         status: 'ACCESS_DENIED',
@@ -21,7 +24,7 @@ const isAuth = (req, resp, netx) => {
   }
 };
 
-const isValidHostname = (req, resp, netx) => {
+const isValidHostname = (req: Request, resp: Response, netx: NextFunction): void => {
   console.log(req.hostname);
   const validHostName = ['dina.ec', 'localhost'];
   if (validHostName.includes(req.hostname)) {
@@ -31,10 +34,11 @@ const isValidHostname = (req, resp, netx) => {
   }
 };
 
-const isAdmin = (req, resp, netx) => {
+const isAdmin = (req: Request, resp: Response, netx: NextFunction): void => {
   try {
     const { role } = req.sessionData;
     if (role !== 'admin') {
+      // eslint-disable-next-line no-throw-literal
       throw {
         code: 404,
         status: 'ACCESS_DENIED',
@@ -48,4 +52,4 @@ const isAdmin = (req, resp, netx) => {
       .send({ status: error.status || 'ERROR', message: error.message });
   }
 };
-module.exports = { isAuth, isValidHostname, isAdmin };
+export { isAuth, isValidHostname, isAdmin };
